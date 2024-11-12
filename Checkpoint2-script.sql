@@ -1,10 +1,11 @@
--- Create the Bookstore Database Schema
 -- Drop tables if they already exist
 DROP TABLE IF EXISTS Book;
 DROP TABLE IF EXISTS Customer;
 DROP TABLE IF EXISTS Bookstore;
 DROP TABLE IF EXISTS Sales;
-DROP TABLE IF EXISTS Supplier;
+DROP TABLE IF EXISTS Supplier; 
+DROP TABLE IF EXISTS Supplier_book;
+DROP TABLE IF EXISTS Supplier_bookstore; 
 DROP TABLE IF EXISTS Orders;
 DROP TABLE IF EXISTS Orderitem;
 
@@ -59,7 +60,7 @@ CREATE TABLE Orderitem (
     order_id INTEGER NOT NULL,                       -- Associated order (FK)
     book_id INTEGER NOT NULL,                        -- Book associated with the order (FK)
     quantity INTEGER NOT NULL,                       -- Quantity of books ordered
-    FOREIGN KEY (order_id) REFERENCES Orders (order_id),
+    FOREIGN KEY (order_id) REFERENCES Orders (order_id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES Book (book_id)
 );
 
@@ -70,8 +71,8 @@ CREATE TABLE Sales (
     customer_id INTEGER,                             -- Customer who made the sale (FK)
     bookstore_id INTEGER,                            -- Bookstore where the sale occurred (FK)
     total_amount REAL NOT NULL,                      -- Total amount of the sale
-    FOREIGN KEY (customer_id) REFERENCES Customer (customer_id),
-    FOREIGN KEY (bookstore_id) REFERENCES Bookstore (bookstore_id)
+    FOREIGN KEY (customer_id) REFERENCES Customer (customer_id) ON DELETE CASCADE,
+    FOREIGN KEY (bookstore_id) REFERENCES Bookstore (bookstore_id) ON DELETE CASCADE
 );
 
 -- Create the Many-to-Many relationship between Suppliers and Books
@@ -79,7 +80,7 @@ CREATE TABLE Supplier_book (
     Supplier_id INTEGER NOT NULL,                   -- Supplier (FK)
     book_id INTEGER NOT NULL,                       -- Book (FK)
     PRIMARY KEY (Supplier_id, book_id),
-    FOREIGN KEY (Supplier_id) REFERENCES Supplier (Supplier_id),
+    FOREIGN KEY (Supplier_id) REFERENCES Supplier (Supplier_id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES Book (book_id)
 );
 
@@ -88,7 +89,7 @@ CREATE TABLE Supplier_bookstore (
     Supplier_id INTEGER NOT NULL,                   -- Supplier (FK)
     bookstore_id INTEGER NOT NULL,                   -- Bookstore (FK)
     PRIMARY KEY (Supplier_id, bookstore_id),
-    FOREIGN KEY (Supplier_id) REFERENCES Supplier (Supplier_id),
+    FOREIGN KEY (Supplier_id) REFERENCES Supplier (Supplier_id) ON DELETE CASCADE,
     FOREIGN KEY (bookstore_id) REFERENCES Bookstore (bookstore_id)
 );
 
@@ -148,3 +149,13 @@ INSERT INTO Supplier_bookstore (Supplier_id, bookstore_id) VALUES
 (1, 1),
 (2, 2);
 
+-- UPDATE and DELETE operations for Supplier
+
+-- Update Supplier information
+UPDATE Supplier
+SET name = 'Updated Supplier Name', contact_info = 'updatedemail@example.com'
+WHERE Supplier_id = 2;  -- Change the Supplier ID to the one you want to update
+
+-- Delete Supplier and automatically remove dependent records due to CASCADE
+DELETE FROM Supplier
+WHERE Supplier_id = 2;  -- Change the Supplier ID to the one you want to delete
