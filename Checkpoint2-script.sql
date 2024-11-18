@@ -152,6 +152,8 @@ INSERT INTO Supplier_bookstore (supplier_id, bookstore_id) VALUES
 (1, 1),
 (2, 2);
 
+-- EXAMPLE QUERIES
+
 -- SELECT Customers who made an order from Bookstore "The Book Nook"
 SELECT C.first_name AS 'The Book Nook Customers'
 FROM Customer C, Sales S, Bookstore B
@@ -234,6 +236,22 @@ WHERE S.supplier_id = 1 AND S.book_id = B.book_id;
 DELETE FROM Supplier_book
 WHERE supplier_id = 1 AND book_id = 2;
 
--- 16 queries done
+-- SELECT Orders that include "1984"
+SELECT O.order_id AS 'Orders that include "1984"'
+FROM Orderitem O
+WHERE O.book_id = 2;
 
--- 
+-- SELECT contact information of Customer "John Doe"
+SELECT C.email AS Email, C.phone AS 'Phone Number'
+FROM Customer C
+WHERE C.customer_id = 1;
+
+-- INSERT new Supplier "#1 Book Supplier"
+INSERT INTO Supplier (name, contact_info) VALUES
+('#1 Book Supplier', 'contact@#1booksupplier.com');
+
+-- INSERT new Customer "Jack Grayson"
+INSERT INTO Customer (first_name, last_name, email, phone) VALUES
+('Jack', 'Grayson', 'jackgrayson@example.com', '736-428-0912');
+
+-- 20 queries done
