@@ -253,5 +253,3 @@ INSERT INTO Supplier (name, contact_info) VALUES
 -- INSERT new Customer "Jack Grayson"
 INSERT INTO Customer (first_name, last_name, email, phone) VALUES
 ('Jack', 'Grayson', 'jackgrayson@example.com', '736-428-0912');
-
--- 20 queries done
