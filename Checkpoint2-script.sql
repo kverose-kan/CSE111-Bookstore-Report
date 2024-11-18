@@ -211,13 +211,20 @@ SELECT C.first_name AS 'Customers who made an order for more than $35'
 FROM Customer C, Sales S
 WHERE S.total_amount > 35 AND S.customer_id = C.customer_id;
 
--- UPDATE and DELETE operations for Supplier
+-- UPDATE quantity of "1984" book available
+UPDATE Book
+SET stock_quantity = 80
+WHERE book_id = 2;
 
--- Update Supplier information
-UPDATE Supplier
-SET name = 'Updated Supplier Name', contact_info = 'updatedemail@example.com'
-WHERE Supplier_id = 2;  -- Change the Supplier ID to the one you want to update
-
--- Delete Supplier and automatically remove dependent records due to CASCADE
+-- DELETE Supplier "Harper Collins"
 DELETE FROM Supplier
-WHERE Supplier_id = 2;  -- Change the Supplier ID to the one you want to delete
+WHERE Supplier_id = 2;
+
+-- UPDATE contact information for "The Book Supplier"
+UPDATE Supplier
+SET contact_info = 'newcontact@penguinbooks.com'
+WHERE supplier_id = 1;
+
+-- 14 queries done
+
+-- 
