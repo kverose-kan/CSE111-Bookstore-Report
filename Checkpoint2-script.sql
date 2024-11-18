@@ -1,3 +1,5 @@
+.headers on
+
 -- Drop tables if they already exist
 DROP TABLE IF EXISTS Book;
 DROP TABLE IF EXISTS Customer;
@@ -39,7 +41,7 @@ CREATE TABLE Bookstore (
 
 -- Supplier Table
 CREATE TABLE Supplier (
-    Supplier_id INTEGER PRIMARY KEY AUTOINCREMENT, -- Unique identifier for the Supplier
+    supplier_id INTEGER PRIMARY KEY AUTOINCREMENT, -- Unique identifier for the Supplier
     name TEXT NOT NULL,                            -- Name of the Supplier
     contact_info TEXT                              -- Contact info of the Supplier
 );
@@ -48,9 +50,9 @@ CREATE TABLE Supplier (
 CREATE TABLE Orders (
     order_id INTEGER PRIMARY KEY AUTOINCREMENT,    -- Unique identifier for the order
     order_date TEXT NOT NULL,                      -- Date when the order was placed
-    customer_id INTEGER,                           -- Customer who placed the order (FK)
+    supplier_id INTEGER,                           -- Supplier who placed the order (FK)
     bookstore_id INTEGER,                          -- Bookstore where the order was placed (FK)
-    FOREIGN KEY (customer_id) REFERENCES Customer (customer_id),
+    FOREIGN KEY (supplier_id) REFERENCES Supplier (supplier_id),
     FOREIGN KEY (bookstore_id) REFERENCES Bookstore (bookstore_id)
 );
 
@@ -77,19 +79,19 @@ CREATE TABLE Sales (
 
 -- Create the Many-to-Many relationship between Suppliers and Books
 CREATE TABLE Supplier_book (
-    Supplier_id INTEGER NOT NULL,                   -- Supplier (FK)
+    supplier_id INTEGER NOT NULL,                   -- Supplier (FK)
     book_id INTEGER NOT NULL,                       -- Book (FK)
-    PRIMARY KEY (Supplier_id, book_id),
-    FOREIGN KEY (Supplier_id) REFERENCES Supplier (Supplier_id) ON DELETE CASCADE,
+    PRIMARY KEY (supplier_id, book_id),
+    FOREIGN KEY (supplier_id) REFERENCES Supplier (supplier_id) ON DELETE CASCADE,
     FOREIGN KEY (book_id) REFERENCES Book (book_id)
 );
 
 -- Create the Many-to-Many relationship between Suppliers and Bookstores
 CREATE TABLE Supplier_bookstore (
-    Supplier_id INTEGER NOT NULL,                   -- Supplier (FK)
+    supplier_id INTEGER NOT NULL,                   -- Supplier (FK)
     bookstore_id INTEGER NOT NULL,                   -- Bookstore (FK)
-    PRIMARY KEY (Supplier_id, bookstore_id),
-    FOREIGN KEY (Supplier_id) REFERENCES Supplier (Supplier_id) ON DELETE CASCADE,
+    PRIMARY KEY (supplier_id, bookstore_id),
+    FOREIGN KEY (supplier_id) REFERENCES Supplier (supplier_id) ON DELETE CASCADE,
     FOREIGN KEY (bookstore_id) REFERENCES Bookstore (bookstore_id)
 );
 
@@ -116,10 +118,11 @@ INSERT INTO Bookstore (name, location, contact_info) VALUES
 -- Insert Suppliers
 INSERT INTO Supplier (name, contact_info) VALUES
 ('Penguin Books', 'contact@penguinbooks.com'),
-('HarperCollins', 'contact@harpercollins.com');
+('Harper Collins', 'contact@harpercollins.com'),
+('The Book Supplier', 'contact@tbs.com');
 
 -- Insert Orders
-INSERT INTO Orders (order_date, customer_id, bookstore_id) VALUES
+INSERT INTO Orders (order_date, supplier_id, bookstore_id) VALUES
 ('2024-11-01', 1, 1),
 ('2024-11-02', 2, 2),
 ('2024-11-03', 3, 1);
@@ -138,16 +141,75 @@ INSERT INTO Sales (sale_date, customer_id, bookstore_id, total_amount) VALUES
 ('2024-11-03', 3, 1, 39.98);
 
 -- Insert Supplier-Book Relations
-INSERT INTO Supplier_book (Supplier_id, book_id) VALUES
+INSERT INTO Supplier_book (supplier_id, book_id) VALUES
 (1, 1),
 (1, 2),
 (2, 3),
 (2, 4);
 
 -- Insert Supplier-Bookstore Relations
-INSERT INTO Supplier_bookstore (Supplier_id, bookstore_id) VALUES
+INSERT INTO Supplier_bookstore (supplier_id, bookstore_id) VALUES
 (1, 1),
 (2, 2);
+
+-- SELECT Customers who made an order from Bookstore "The Book Nook"
+SELECT C.first_name AS 'The Book Nook Customers'
+FROM Customer C, Sales S, Bookstore B
+WHERE B.name = 'The Book Nook' AND B.bookstore_id = S.bookstore_id AND S.customer_id = C.customer_id;
+
+-- SELECT Bookstores who made an order from Supplier "Penguin Books"
+SELECT B.name AS 'Bookstores supplied by Penguin Books'
+FROM Supplier Su, Orders O, Bookstore B
+WHERE Su.name = 'Penguin Books' AND Su.supplier_id = O.supplier_id AND O.bookstore_id = B.bookstore_id;
+
+-- SELECT Customers who made an order on 2024-11-01
+SELECT C.first_name AS 'Customers who ordered on 2024-11-01'
+FROM Customer C, Sales S
+WHERE S.sale_date LIKE '2024-11-01' AND S.customer_id = C.customer_id;
+
+-- SELECT Bookstores who made an order on 2024-11-01
+SELECT B.name AS 'Bookstores who ordered on 2024-11-01'
+FROM Bookstore B, Orders O
+WHERE O.order_date LIKE '2024-11-01' AND O.bookstore_id = B.bookstore_id;
+
+-- SELECT Suppliers who supplied to Bookstore "Reader's Haven"
+SELECT S.name AS 'Suppliers who supplied to Reader''s Haven'
+FROM Supplier S, Orders O
+WHERE O.bookstore_id = 2 AND O.supplier_id = S.supplier_id;
+
+-- SELECT Suppliers who supplied to Bookstore "The Book Nook"
+SELECT S.name AS 'Suppliers who supplied to The Book Nook'
+FROM Supplier S, Orders O
+WHERE O.bookstore_id = 1 AND O.supplier_id = S.supplier_id;
+
+-- SELECT Books with stock quantity > 50
+SELECT B.title AS 'Books with stock quantity > 50'
+FROM Book B
+WHERE B.stock_quantity > 50;
+
+-- SELECT Books that are Classics
+SELECT B.title AS Classics
+FROM Book B
+WHERE B.genre = 'Classic';
+
+-- SELECT Orders that involve multiple books
+SELECT O.order_id AS 'Order ID'
+FROM Orderitem O
+GROUP BY O.order_id
+HAVING COUNT(DISTINCT O.book_id) > 1;
+
+-- SELECT Books that are part of an order for multiple books
+SELECT B.title AS 'Books that are part of orders for multiple books'
+FROM Book B, Orderitem O, (SELECT O.order_id AS 'Order_ID'
+                           FROM Orderitem O
+                           GROUP BY O.order_id
+                           HAVING COUNT(DISTINCT O.book_id) > 1) M
+WHERE O.order_id = M.Order_ID AND B.book_id = O.book_id;
+
+-- SELECT Customers who made an order for more than $35
+SELECT C.first_name AS 'Customers who made an order for more than $35'
+FROM Customer C, Sales S
+WHERE S.total_amount > 35 AND S.customer_id = C.customer_id;
 
 -- UPDATE and DELETE operations for Supplier
 
