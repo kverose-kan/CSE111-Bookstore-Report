@@ -193,7 +193,7 @@ FROM Book B
 WHERE B.genre = 'Classic';
 
 -- SELECT Orders that involve multiple books
-SELECT O.order_id AS 'Order ID'
+SELECT O.order_id AS 'Order ID''s involving multiple books'
 FROM Orderitem O
 GROUP BY O.order_id
 HAVING COUNT(DISTINCT O.book_id) > 1;
@@ -225,6 +225,15 @@ UPDATE Supplier
 SET contact_info = 'newcontact@penguinbooks.com'
 WHERE supplier_id = 1;
 
--- 14 queries done
+-- Books that are supplied by Supplier "Penguin Books"
+SELECT B.title AS 'Books that are supplied by "Penguin Books"'
+FROM Book B, Supplier_book S
+WHERE S.supplier_id = 1 AND S.book_id = B.book_id;
+
+-- DELETE Supplier - Book relationship between "1984" and "Penguin Books"
+DELETE FROM Supplier_book
+WHERE supplier_id = 1 AND book_id = 2;
+
+-- 16 queries done
 
 -- 
