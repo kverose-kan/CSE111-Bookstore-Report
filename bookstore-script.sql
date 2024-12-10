@@ -220,7 +220,7 @@ WHERE book_id = 2;
 
 -- DELETE Supplier "Harper Collins"
 DELETE FROM Supplier
-WHERE Supplier_id = 2;
+WHERE supplier_id = 2;
 
 -- UPDATE contact information for "The Book Supplier"
 UPDATE Supplier
@@ -253,3 +253,4 @@ INSERT INTO Supplier (name, contact_info) VALUES
 -- INSERT new Customer "Jack Grayson"
 INSERT INTO Customer (first_name, last_name, email, phone) VALUES
 ('Jack', 'Grayson', 'jackgrayson@example.com', '736-428-0912');
+
